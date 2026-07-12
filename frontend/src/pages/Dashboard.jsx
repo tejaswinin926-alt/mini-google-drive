@@ -6,7 +6,7 @@ import Sidebar from "../components/Sidebar";
 import Upload from "../components/Upload";
 import MyFiles from "../components/MyFiles";
 
-import "../styles/dashboard.css";
+import "../styles/Dashboard.css";
 
 function Dashboard() {
   const [refreshTrigger, setRefreshTrigger] = useState(0);
