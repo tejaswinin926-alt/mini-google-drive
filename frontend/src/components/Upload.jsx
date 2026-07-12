@@ -1,7 +1,7 @@
 import { useState } from "react";
 import "../styles/upload.css";
 
-const API_URL = "http://localhost:5000/api";
+import { API_URL } from "../api";
 
 function Upload({ onUploadSuccess }) {
   const [file, setFile] = useState(null);

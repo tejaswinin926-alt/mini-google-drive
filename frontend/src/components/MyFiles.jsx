@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 
-const API_URL = 'http://localhost:5000/api'
-
+import { API_URL } from "../api";
 
 function MyFiles({ refreshTrigger }) {
 
