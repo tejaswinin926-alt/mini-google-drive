@@ -5,68 +5,61 @@ from extensions import db, jwt
 import os
 
 
-def create_app(config_name='default'):
-    """Application factory pattern"""
+def create_app(config_name="default"):
+    """Application Factory"""
 
-    print("STEP 1: Creating Flask app")
+    print("🚀 Creating Flask application...")
 
     app = Flask(__name__)
-
-    print("STEP 2: Loading configuration")
 
     # Load configuration
     app.config.from_object(config[config_name])
 
-    print("STEP 3: Initializing extensions")
-
     # Initialize extensions
     db.init_app(app)
     jwt.init_app(app)
-    CORS(app)
 
-    print("STEP 4: Checking upload folder")
+    # Enable CORS
+    CORS(
+        app,
+        resources={r"/api/*": {"origins": "*"}},
+        supports_credentials=True,
+    )
 
-    # Create upload folder if it doesn't exist
-    if not os.path.exists(app.config['UPLOAD_FOLDER']):
-        os.makedirs(app.config['UPLOAD_FOLDER'])
+    # Create uploads directory if it doesn't exist
+    upload_folder = app.config["UPLOAD_FOLDER"]
+    os.makedirs(upload_folder, exist_ok=True)
 
-    print("STEP 5: Importing routes")
-
-    # Register blueprints
+    # Register API routes
     from routes import api_bp
 
-    print("STEP 6: Registering routes")
+    app.register_blueprint(api_bp, url_prefix="/api")
 
-    app.register_blueprint(api_bp, url_prefix='/api')
-
-    print("STEP 7: Importing models")
-
-    # Import models to ensure they are registered with SQLAlchemy
+    # Import models
     from models import User, File
-
-    print("STEP 8: Creating database tables")
 
     # Create database tables
     with app.app_context():
         db.create_all()
 
-    print("STEP 9: Database ready")
+    print("✅ Application initialized successfully!")
 
     return app
 
 
-print("Starting application...")
+# Detect environment automatically
+config_name = "production" if os.getenv("RENDER") else "development"
 
-# Create the app instance
-app = create_app()
+# Create Flask application
+app = create_app(config_name)
 
-print("Application created successfully")
+print(f"Running in {config_name.upper()} mode")
 
-if __name__ == '__main__':
-    print("Starting Flask server on port 5000...")
+
+if __name__ == "__main__":
     app.run(
-        debug=True,
-        host='0.0.0.0',
-        port=5000,
-        use_reloader=False
+        host="0.0.0.0",
+        port=int(os.environ.get("PORT", 5000)),
+        debug=config_name == "development",
+        use_reloader=False,
     )
